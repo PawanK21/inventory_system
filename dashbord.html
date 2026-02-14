@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+
+<h2>Inventory Dashboard</h2>
+
+<p>Welcome {{ request.user.username }}</p>
+
+<a href="{% url 'logout' %}">Logout</a>
+
+<hr>
+
+<h3>Items</h3>
+
+{% if items %}
+    <ul>
+        {% for item in items %}
+            <li>
+                <strong>{{ item.name }}</strong> ({{ item.code }})
+                <a href="/inventory/summary/{{ item.id }}/">
+                    View Stock
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No items found in system.</p>
+{% endif %}
+
+</body>
+</html>
