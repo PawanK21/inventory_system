@@ -298,3 +298,7 @@ For production deployment:
 ## License
 
 MIT
+
+AI tools used:
+  - claude.ai
+  - copilot
