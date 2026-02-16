@@ -302,3 +302,14 @@ MIT
 AI tools used:
   - claude.ai
   - copilot
+
+Project Images:
+<img width="1861" height="921" alt="Screenshot 2026-02-17 021108" src="https://github.com/user-attachments/assets/9380ac7f-00bf-4d66-ac7b-68b7d10cf75b" />
+<img width="1873" height="954" alt="Screenshot 2026-02-17 021045" src="https://github.com/user-attachments/assets/5e99bcf6-6963-461a-9fb1-a5d2d6c0ff71" />
+<img width="1893" height="962" alt="Screenshot 2026-02-17 021021" src="https://github.com/user-attachments/assets/ad8e49fa-5f69-4e86-9519-9b85d7aa2656" />
+<img width="1857" height="817" alt="Screenshot 2026-02-17 020949" src="https://github.com/user-attachments/assets/db9fee6b-b97d-4270-a6c0-69b8c486c39e" />
+<img width="1898" height="839" alt="Screenshot 2026-02-17 020921" src="https://github.com/user-attachments/assets/2a07fca9-3ae5-4e08-a0f7-c7abd5f5be69" />
+<img width="1871" height="875" alt="Screenshot 2026-02-17 020851" src="https://github.com/user-attachments/assets/44dd789c-003a-4dae-8616-ae7faacf46e9" />
+<img width="1876" height="968" alt="Screenshot 2026-02-17 020637" src="https://github.com/user-attachments/assets/cab791e1-fc05-49c6-8fe2-c29b81df750e" />
+
+
