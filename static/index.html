@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Archivo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #151922;
+            --bg-tertiary: #1c222e;
+            --accent-primary: #00d9ff;
+            --accent-secondary: #7c3aed;
+            --accent-warning: #fbbf24;
+            --accent-danger: #ef4444;
+            --accent-success: #10b981;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border: #30363d;
+            --shadow: rgba(0, 217, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Archivo', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .logo p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--accent-primary);
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-out 0.1s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        /* Action Panel */
+        .action-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-out 0.2s both;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .form-input, .form-select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: 'Archivo', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 0;
+        }
+
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Archivo', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-primary);
+        }
+
+        .btn-success {
+            background: var(--accent-success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--accent-warning);
+            color: var(--bg-primary);
+        }
+
+        .btn-danger {
+            background: var(--accent-danger);
+            color: white;
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out 0.3s both;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .search-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            width: 300px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .table tr {
+            transition: background 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-approved, .badge-APPROVED {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
+        }
+
+        .badge-quarantine, .badge-QUARANTINE {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--accent-warning);
+            border: 1px solid var(--accent-warning);
+        }
+
+        .badge-rejected, .badge-REJECTED {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+        }
+
+        .badge-info, .badge-ACTIVE {
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+        }
+
+        .badge-PARTIAL {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--accent-warning);
+            border: 1px solid var(--accent-warning);
+        }
+
+        .badge-COMPLETED {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 14, 20, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            min-width: 300px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            animation: slideInRight 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--accent-success);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--accent-danger);
+        }
+
+        .toast-warning {
+            border-left: 4px solid var(--accent-warning);
+        }
+
+        .toast-info {
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--bg-tertiary);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .lot-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .detail-item {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 14, 20, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            display: none;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner" style="width: 50px; height: 50px; border-width: 5px;"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>INV.SYS</h1>
+                <p>v2.0.1 • PROD</p>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-page="dashboard">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="receive">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Receive Inventory
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="reserve">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Reserve Stock
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="issue">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                            Issue Stock
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="items">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                            Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="lots">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                            Lots
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="ledger">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Ledger
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Content will be loaded dynamically -->
+        </main>
+    </div>
+
+    <script>
+        // ==================== API CLIENT ====================
+        
+        const API_BASE_URL = 'http://localhost:8000/api';
+
+        class APIClient {
+            async request(endpoint, options = {}) {
+                const url = `${API_BASE_URL}${endpoint}`;
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Request failed');
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            }
+
+            // Items
+            async getItems() {
+                return this.request('/items');
+            }
+
+            async getItem(id) {
+                return this.request(`/items/${id}`);
+            }
+
+            async addItem(data) {
+                return this.request('/items', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                });
+            }
+
+            // Lots
+            async getLots() {
+                return this.request('/lots');
+            }
+
+            async getLot(id) {
+                return this.request(`/lots/${id}`);
+            }
+
+            async getLotSummary(id) {
+                return this.request(`/inventory/lot/${id}`);
+            }
+
+            async updateQCStatus(lotId, status) {
+                return this.request('/lots/qc-status', {
+                    method: 'PUT',
+                    body: JSON.stringify({ lotId, status }),
+                });
+            }
+
+            // Inventory Operations
+            async receiveInventory(data) {
+                return this.request('/inventory/receive', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                });
+            }
+
+            async getStockSummary(itemId) {
+                return this.request(`/inventory/summary/${itemId}`);
+            }
+
+            async reserveInventory(data) {
+                return this.request('/inventory/reserve', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                });
+            }
+
+            async issueInventory(data) {
+                return this.request('/inventory/issue', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                });
+            }
+
+            // Ledger
+            async getLedger() {
+                return this.request('/ledger');
+            }
+
+            async getItemLedger(itemId) {
+                return this.request(`/ledger/item/${itemId}`);
+            }
+
+            async getLotLedger(lotId) {
+                return this.request(`/ledger/lot/${lotId}`);
+            }
+
+            // Reservations
+            async getReservations() {
+                return this.request('/reservations');
+            }
+
+            async getReservation(id) {
+                return this.request(`/reservations/${id}`);
+            }
+
+            // Stats
+            async getStats() {
+                return this.request('/stats');
+            }
+        }
+
+        const api = new APIClient();
+        let currentPage = 'dashboard';
+
+        // ==================== UI UTILITIES ====================
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function showToast(type, title, message) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleString();
+        }
+
+        function filterTable(query, tableId) {
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const searchTerm = query.toLowerCase();
+
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            }
+        }
+
+        // ==================== PAGE RENDERERS ====================
+
+        async function renderDashboard() {
+            try {
+                showLoading();
+                const [stats, items] = await Promise.all([
+                    api.getStats(),
+                    api.getItems()
+                ]);
+
+                const itemSummaries = await Promise.all(
+                    items.map(item => api.getStockSummary(item.id))
+                );
+
+                hideLoading();
+
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">Inventory Dashboard</h1>
+                        <p class="page-subtitle">Real-time overview of inventory status and operations</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Items</div>
+                            <div class="stat-value">${stats.totalItems}</div>
+                            <div class="stat-change">Managed materials</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Active Lots</div>
+                            <div class="stat-value">${stats.totalLots}</div>
+                            <div class="stat-change">${stats.approvedLots} approved, ${stats.quarantineLots} in QC</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Reservations</div>
+                            <div class="stat-value">${stats.activeReservations}</div>
+                            <div class="stat-change">Active allocations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Transactions</div>
+                            <div class="stat-value">${stats.totalTransactions}</div>
+                            <div class="stat-change">Total ledger entries</div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Item Stock Summary</h2>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Name</th>
+                                    <th>On Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Available</th>
+                                    <th>QC Required</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.map((item, i) => {
+                                    const summary = itemSummaries[i];
+                                    return `
+                                        <tr>
+                                            <td><strong>${item.code}</strong></td>
+                                            <td>${item.name}</td>
+                                            <td><strong>${summary.onHand}</strong></td>
+                                            <td><span class="badge badge-warning">${summary.reserved}</span></td>
+                                            <td><span class="badge badge-${summary.available > 0 ? 'approved' : 'danger'}">${summary.available}</span></td>
+                                            <td>${item.qcRequired ? '<span class="badge badge-info">Yes</span>' : '<span class="badge">No</span>'}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn btn-small btn-primary" onclick="showItemDetails('${item.id}')">Details</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+                return '<p>Error loading dashboard</p>';
+            }
+        }
+
+        async function renderReceiveInventory() {
+            try {
+                showLoading();
+                const [items, ledger] = await Promise.all([
+                    api.getItems(),
+                    api.getLedger()
+                ]);
+                const lots = await api.getLots();
+                hideLoading();
+
+                const receiveEntries = ledger.filter(e => e.txnType === 'RECEIVE').slice(0, 10);
+
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">Receive Inventory</h1>
+                        <p class="page-subtitle">Create new lot and record incoming materials</p>
+                    </div>
+
+                    <div class="action-panel">
+                        <h2 class="panel-title">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            New Receipt
+                        </h2>
+                        <form id="receiveForm" onsubmit="handleReceive(event)">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Item</label>
+                                    <select class="form-select" id="receiveItemId" required>
+                                        <option value="">Select item...</option>
+                                        ${items.map(item => 
+                                            `<option value="${item.id}">${item.code} - ${item.name}</option>`
+                                        ).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Lot Code</label>
+                                    <input type="text" class="form-input" id="receiveLotCode" required 
+                                           placeholder="e.g., LOT-2024-001">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" class="form-input" id="receiveQty" required 
+                                           min="1" step="1" placeholder="e.g., 1000">
+                                </div>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" class="checkbox-input" id="receiveQcRequired">
+                                <label class="form-label" for="receiveQcRequired" style="margin: 0;">
+                                    QC Required (lot will start in QUARANTINE)
+                                </label>
+                            </div>
+                            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                                <button type="submit" class="btn btn-primary">Receive Inventory</button>
+                                <button type="reset" class="btn btn-secondary">Clear Form</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Recent Receipts</h2>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Lot Code</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>QC Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${receiveEntries.map(entry => {
+                                    const lot = lots.find(l => l.id === entry.lotId);
+                                    const item = items.find(i => i.id === entry.itemId);
+                                    return `
+                                        <tr>
+                                            <td>${formatDate(entry.timestamp)}</td>
+                                            <td><strong>${entry.metadata.lotCode}</strong></td>
+                                            <td>${item.code} - ${item.name}</td>
+                                            <td>${entry.qty}</td>
+                                            <td><span class="badge badge-${lot.qcStatus}">${lot.qcStatus}</span></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+                return '<p>Error loading page</p>';
+            }
+        }
+
+        async function renderReserveInventory() {
+            try {
+                showLoading();
+                const [items, reservations] = await Promise.all([
+                    api.getItems(),
+                    api.getReservations()
+                ]);
+                hideLoading();
+
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">Reserve Stock</h1>
+                        <p class="page-subtitle">Allocate inventory for production batches</p>
+                    </div>
+
+                    <div class="action-panel">
+                        <h2 class="panel-title">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            New Reservation
+                        </h2>
+                        <form id="reserveForm" onsubmit="handleReserve(event)">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Item</label>
+                                    <select class="form-select" id="reserveItemId" required onchange="updateAvailableStock(this.value)">
+                                        <option value="">Select item...</option>
+                                        ${items.map(item => 
+                                            `<option value="${item.id}">${item.code} - ${item.name}</option>`
+                                        ).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Batch ID</label>
+                                    <input type="text" class="form-input" id="reserveBatchId" required 
+                                           placeholder="e.g., BATCH-001">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" class="form-input" id="reserveQty" required 
+                                           min="1" step="1" placeholder="e.g., 100">
+                                </div>
+                            </div>
+                            <div id="stockInfo" style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; display: none;">
+                                <div class="detail-label">Available Stock</div>
+                                <div class="detail-value" id="availableStock">-</div>
+                            </div>
+                            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                                <button type="submit" class="btn btn-success">Create Reservation</button>
+                                <button type="reset" class="btn btn-secondary">Clear Form</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Active Reservations</h2>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Reservation ID</th>
+                                    <th>Item</th>
+                                    <th>Batch ID</th>
+                                    <th>Reserved</th>
+                                    <th>Issued</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${reservations.map(res => {
+                                    const item = items.find(i => i.id === res.itemId);
+                                    const remaining = res.totalQty - res.issuedQty;
+                                    return `
+                                        <tr>
+                                            <td><strong>${res.id}</strong></td>
+                                            <td>${item.code}</td>
+                                            <td>${res.batchId}</td>
+                                            <td>${res.totalQty}</td>
+                                            <td>${res.issuedQty}</td>
+                                            <td><span class="badge badge-${remaining > 0 ? 'warning' : 'approved'}">${remaining}</span></td>
+                                            <td><span class="badge badge-${res.status}">${res.status}</span></td>
+                                            <td>${formatDate(res.timestamp)}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+                return '<p>Error loading page</p>';
+            }
+        }
+
+        async function renderIssueInventory() {
+            try {
+                showLoading();
+                const [items, reservations, ledger] = await Promise.all([
+                    api.getItems(),
+                    api.getReservations(),
+                    api.getLedger()
+                ]);
+                const lots = await api.getLots();
+                hideLoading();
+
+                const activeReservations = reservations.filter(r => r.issuedQty < r.totalQty);
+                const issueEntries = ledger.filter(e => e.txnType === 'ISSUE').slice(0, 10);
+
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">Issue Stock</h1>
+                        <p class="page-subtitle">Dispense reserved inventory for production</p>
+                    </div>
+
+                    <div class="action-panel">
+                        <h2 class="panel-title">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                            Issue from Reservation
+                        </h2>
+                        <form id="issueForm" onsubmit="handleIssue(event)">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Reservation</label>
+                                    <select class="form-select" id="issueReservationId" required onchange="updateReservationInfo(this.value)">
+                                        <option value="">Select reservation...</option>
+                                        ${activeReservations.map(res => {
+                                            const item = items.find(i => i.id === res.itemId);
+                                            const remaining = res.totalQty - res.issuedQty;
+                                            return `<option value="${res.id}">${res.id} - ${item.code} (${res.batchId}) - Remaining: ${remaining}</option>`;
+                                        }).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Quantity to Issue</label>
+                                    <input type="number" class="form-input" id="issueQty" required 
+                                           min="1" step="1" placeholder="e.g., 50">
+                                </div>
+                            </div>
+                            <div id="reservationInfo" style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; display: none;">
+                                <div class="lot-details">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Total Reserved</div>
+                                        <div class="detail-value" id="totalReserved">-</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Already Issued</div>
+                                        <div class="detail-value" id="alreadyIssued">-</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Remaining</div>
+                                        <div class="detail-value" id="remaining">-</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Batch ID</div>
+                                        <div class="detail-value" id="batchId">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                                <button type="submit" class="btn btn-danger">Issue Stock</button>
+                                <button type="reset" class="btn btn-secondary">Clear Form</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Recent Issues</h2>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Reservation ID</th>
+                                    <th>Item</th>
+                                    <th>Lot</th>
+                                    <th>Quantity</th>
+                                    <th>Batch ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${issueEntries.map(entry => {
+                                    const item = items.find(i => i.id === entry.itemId);
+                                    const lot = lots.find(l => l.id === entry.lotId);
+                                    return `
+                                        <tr>
+                                            <td>${formatDate(entry.timestamp)}</td>
+                                            <td><strong>${entry.metadata.reservationId}</strong></td>
+                                            <td>${item.code}</td>
+                                            <td>${lot.lotCode}</td>
+                                            <td><strong>${entry.qty}</strong></td>
+                                            <td>${entry.metadata.batchId}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+                return '<p>Error loading page</p>';
+            }
+        }
+
+        async function renderItems() {
+            try {
+                showLoading();
+                const items = await api.getItems();
+                const itemSummaries = await Promise.all(
+                    items.map(item => api.getStockSummary(item.id))
+                );
+                hideLoading();
+
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">Items</h1>
+                        <p class="page-subtitle">Manage inventory materials catalog</p>
+                    </div>
+
+                    <div class="action-panel">
+                        <h2 class="panel-title">Add New Item</h2>
+                        <form id="addItemForm" onsubmit="handleAddItem(event)">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Item Code</label>
+                                    <input type="text" class="form-input" id="itemCode" required 
+                                           placeholder="e.g., RM-005">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Item Name</label>
+                                    <input type="text" class="form-input" id="itemName" required 
+                                           placeholder="e.g., Steel Plate 5mm">
+                                </div>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" class="checkbox-input" id="itemQcRequired">
+                                <label class="form-label" for="itemQcRequired" style="margin: 0;">QC Required</label>
+                            </div>
+                            <div style="margin-top: 1.5rem;">
+                                <button type="submit" class="btn btn-primary">Add Item</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">All Items</h2>
+                            <input type="text" class="search-box" placeholder="Search items..." 
+                                   onkeyup="filterTable(this.value, 'itemsTable')">
+                        </div>
+                        <table class="table" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>QC Required</th>
+                                    <th>On Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Available</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.map((item, i) => {
+                                    const summary = itemSummaries[i];
+                                    return `
+                                        <tr>
+                                            <td><strong>${item.code}</strong></td>
+                                            <td>${item.name}</td>
+                                            <td>${item.qcRequired ? '<span class="badge badge-info">Yes</span>' : '<span class="badge">No</span>'}</td>
+                                            <td>${summary.onHand}</td>
+                                            <td>${summary.reserved}</td>
+                                            <td><span class="badge badge-${summary.available > 0 ? 'approved' : 'quarantine'}">${summary.available}</span></td>
+                                            <td>
+                                                <button class="btn btn-small btn-primary" onclick="showItemDetails('${item.id}')">
+                                                    Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+                return '<p>Error loading page</p>';
+            }
+        }
+
+        async function renderLots() {
+            try {
+                showLoading();
+                const [lots, items] = await Promise.all([
+                    api.getLots(),
+                    api.getItems()
+                ]);
+                
+                const lotSummaries = await Promise.all(
+                    lots.map(lot => api.getLotSummary(lot.id))
+                );
+                hideLoading();
+
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">Lots</h1>
+                        <p class="page-subtitle">View and manage inventory lots and QC status</p>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">All Lots</h2>
+                            <input type="text" class="search-box" placeholder="Search lots..." 
+                                   onkeyup="filterTable(this.value, 'lotsTable')">
+                        </div>
+                        <table class="table" id="lotsTable">
+                            <thead>
+                                <tr>
+                                    <th>Lot Code</th>
+                                    <th>Item</th>
+                                    <th>Received Date</th>
+                                    <th>Received Qty</th>
+                                    <th>On Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Available</th>
+                                    <th>QC Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${lots.map((lot, i) => {
+                                    const item = items.find(it => it.id === lot.itemId);
+                                    const summary = lotSummaries[i];
+                                    return `
+                                        <tr>
+                                            <td><strong>${lot.lotCode}</strong></td>
+                                            <td>${item.code} - ${item.name}</td>
+                                            <td>${new Date(lot.receivedDate).toLocaleDateString()}</td>
+                                            <td>${lot.receivedQty}</td>
+                                            <td>${summary.onHand}</td>
+                                            <td>${summary.reserved}</td>
+                                            <td><span class="badge badge-${summary.available > 0 ? 'approved' : 'quarantine'}">${summary.available}</span></td>
+                                            <td><span class="badge badge-${lot.qcStatus}">${lot.qcStatus}</span></td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    ${lot.qcStatus === 'QUARANTINE' ? `
+                                                        <button class="btn btn-small btn-success" onclick="updateQCStatus('${lot.id}', 'APPROVED')">Approve</button>
+                                                        <button class="btn btn-small btn-danger" onclick="updateQCStatus('${lot.id}', 'REJECTED')">Reject</button>
+                                                    ` : ''}
+                                                    <button class="btn btn-small btn-primary" onclick="showLotDetails('${lot.id}')">Details</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+                return '<p>Error loading page</p>';
+            }
+        }
+
+        async function renderLedger() {
+            try {
+                showLoading();
+                const [ledger, items, lots] = await Promise.all([
+                    api.getLedger(),
+                    api.getItems(),
+                    api.getLots()
+                ]);
+                hideLoading();
+
+                return `
+                    <div class="page-header">
+                        <h1 class="page-title">Transaction Ledger</h1>
+                        <p class="page-subtitle">Complete audit trail of all inventory transactions</p>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">All Transactions</h2>
+                            <input type="text" class="search-box" placeholder="Search transactions..." 
+                                   onkeyup="filterTable(this.value, 'ledgerTable')">
+                        </div>
+                        <table class="table" id="ledgerTable">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Transaction Type</th>
+                                    <th>Item</th>
+                                    <th>Lot</th>
+                                    <th>Quantity</th>
+                                    <th>Metadata</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${ledger.map(entry => {
+                                    const item = items.find(i => i.id === entry.itemId);
+                                    const lot = lots.find(l => l.id === entry.lotId);
+                                    const txnClass = {
+                                        'RECEIVE': 'approved',
+                                        'RESERVE': 'warning',
+                                        'ISSUE': 'danger',
+                                        'UNRESERVE': 'info'
+                                    };
+                                    return `
+                                        <tr>
+                                            <td>${formatDate(entry.timestamp)}</td>
+                                            <td><span class="badge badge-${txnClass[entry.txnType]}">${entry.txnType}</span></td>
+                                            <td>${item.code}</td>
+                                            <td>${lot.lotCode}</td>
+                                            <td><strong>${entry.qty}</strong></td>
+                                            <td><code>${JSON.stringify(entry.metadata || {})}</code></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+                return '<p>Error loading page</p>';
+            }
+        }
+
+        // ==================== EVENT HANDLERS ====================
+
+        async function handleReceive(event) {
+            event.preventDefault();
+            try {
+                showLoading();
+                const data = {
+                    itemId: document.getElementById('receiveItemId').value,
+                    lotCode: document.getElementById('receiveLotCode').value,
+                    qty: parseInt(document.getElementById('receiveQty').value),
+                    qcRequired: document.getElementById('receiveQcRequired').checked
+                };
+
+                const result = await api.receiveInventory(data);
+                hideLoading();
+                
+                showToast('success', 'Inventory Received', result.message);
+                event.target.reset();
+                navigateTo('lots');
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+            }
+        }
+
+        async function handleReserve(event) {
+            event.preventDefault();
+            try {
+                showLoading();
+                const data = {
+                    itemId: document.getElementById('reserveItemId').value,
+                    qty: parseInt(document.getElementById('reserveQty').value),
+                    batchId: document.getElementById('reserveBatchId').value
+                };
+
+                const result = await api.reserveInventory(data);
+                hideLoading();
+                
+                showToast('success', 'Reservation Created', result.message);
+                event.target.reset();
+                document.getElementById('stockInfo').style.display = 'none';
+                navigateTo('reserve');
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Reservation Failed', error.message);
+            }
+        }
+
+        async function handleIssue(event) {
+            event.preventDefault();
+            try {
+                showLoading();
+                const data = {
+                    reservationId: document.getElementById('issueReservationId').value,
+                    qty: parseInt(document.getElementById('issueQty').value)
+                };
+
+                const result = await api.issueInventory(data);
+                hideLoading();
+                
+                showToast('success', 'Stock Issued', result.message);
+                event.target.reset();
+                document.getElementById('reservationInfo').style.display = 'none';
+                navigateTo('issue');
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Issue Failed', error.message);
+            }
+        }
+
+        async function handleAddItem(event) {
+            event.preventDefault();
+            try {
+                showLoading();
+                const data = {
+                    code: document.getElementById('itemCode').value,
+                    name: document.getElementById('itemName').value,
+                    qcRequired: document.getElementById('itemQcRequired').checked
+                };
+
+                const item = await api.addItem(data);
+                hideLoading();
+                
+                showToast('success', 'Item Added', `${item.code} - ${item.name} added to catalog`);
+                event.target.reset();
+                navigateTo('items');
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+            }
+        }
+
+        async function updateAvailableStock(itemId) {
+            if (itemId) {
+                try {
+                    const summary = await api.getStockSummary(itemId);
+                    document.getElementById('availableStock').textContent = summary.available;
+                    document.getElementById('stockInfo').style.display = 'block';
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                document.getElementById('stockInfo').style.display = 'none';
+            }
+        }
+
+        async function updateReservationInfo(reservationId) {
+            if (reservationId) {
+                try {
+                    const reservation = await api.getReservation(reservationId);
+                    const remaining = reservation.totalQty - reservation.issuedQty;
+                    document.getElementById('totalReserved').textContent = reservation.totalQty;
+                    document.getElementById('alreadyIssued').textContent = reservation.issuedQty;
+                    document.getElementById('remaining').textContent = remaining;
+                    document.getElementById('batchId').textContent = reservation.batchId;
+                    document.getElementById('reservationInfo').style.display = 'block';
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                document.getElementById('reservationInfo').style.display = 'none';
+            }
+        }
+
+        async function updateQCStatus(lotId, status) {
+            try {
+                showLoading();
+                await api.updateQCStatus(lotId, status);
+                hideLoading();
+                showToast('success', 'QC Status Updated', `Lot status changed to ${status}`);
+                navigateTo('lots');
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+            }
+        }
+
+        async function showItemDetails(itemId) {
+            try {
+                showLoading();
+                const [item, summary, lots, allLots] = await Promise.all([
+                    api.getItem(itemId),
+                    api.getStockSummary(itemId),
+                    api.getLots(),
+                    api.getLots()
+                ]);
+                
+                const itemLots = allLots.filter(l => l.itemId === itemId);
+                const lotSummaries = await Promise.all(
+                    itemLots.map(lot => api.getLotSummary(lot.id))
+                );
+                hideLoading();
+
+                const modal = document.createElement('div');
+                modal.className = 'modal active';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${item.code} - ${item.name}</h2>
+                            <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+                        </div>
+                        <div class="lot-details">
+                            <div class="detail-item">
+                                <div class="detail-label">On Hand</div>
+                                <div class="detail-value">${summary.onHand}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Reserved</div>
+                                <div class="detail-value">${summary.reserved}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Available</div>
+                                <div class="detail-value">${summary.available}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">QC Required</div>
+                                <div class="detail-value">${item.qcRequired ? 'Yes' : 'No'}</div>
+                            </div>
+                        </div>
+                        <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Associated Lots (${itemLots.length})</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Lot Code</th>
+                                    <th>QC Status</th>
+                                    <th>On Hand</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemLots.map((lot, i) => {
+                                    const lotSummary = lotSummaries[i];
+                                    return `
+                                        <tr>
+                                            <td>${lot.lotCode}</td>
+                                            <td><span class="badge badge-${lot.qcStatus}">${lot.qcStatus}</span></td>
+                                            <td>${lotSummary.onHand}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+            }
+        }
+
+        async function showLotDetails(lotId) {
+            try {
+                showLoading();
+                const [lot, item, summary, ledger] = await Promise.all([
+                    api.getLot(lotId),
+                    api.getLots().then(lots => lots.find(l => l.id === lotId)).then(l => api.getItem(l.itemId)),
+                    api.getLotSummary(lotId),
+                    api.getLotLedger(lotId)
+                ]);
+                hideLoading();
+
+                const modal = document.createElement('div');
+                modal.className = 'modal active';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Lot: ${lot.lotCode}</h2>
+                            <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div class="detail-label">Item</div>
+                            <div class="detail-value">${item.code} - ${item.name}</div>
+                        </div>
+                        <div class="lot-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Received Qty</div>
+                                <div class="detail-value">${lot.receivedQty}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">On Hand</div>
+                                <div class="detail-value">${summary.onHand}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Reserved</div>
+                                <div class="detail-value">${summary.reserved}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Available</div>
+                                <div class="detail-value">${summary.available}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">QC Status</div>
+                                <div class="detail-value"><span class="badge badge-${lot.qcStatus}">${lot.qcStatus}</span></div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Received Date</div>
+                                <div class="detail-value">${new Date(lot.receivedDate).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                        <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Transactions (${ledger.length})</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Type</th>
+                                    <th>Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${ledger.map(txn => `
+                                    <tr>
+                                        <td>${formatDate(txn.timestamp)}</td>
+                                        <td><span class="badge badge-info">${txn.txnType}</span></td>
+                                        <td>${txn.qty}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                hideLoading();
+                showToast('error', 'Error', error.message);
+            }
+        }
+
+        async function navigateTo(page) {
+            currentPage = page;
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.page === page) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Render page content
+            const mainContent = document.getElementById('mainContent');
+            const pages = {
+                'dashboard': renderDashboard,
+                'receive': renderReceiveInventory,
+                'reserve': renderReserveInventory,
+                'issue': renderIssueInventory,
+                'items': renderItems,
+                'lots': renderLots,
+                'ledger': renderLedger
+            };
+
+            mainContent.innerHTML = await pages[page]();
+        }
+
+        // ==================== INITIALIZATION ====================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navigateTo(link.dataset.page);
+                });
+            });
+
+            // Initial render
+            navigateTo('dashboard');
+
+            // Show welcome toast
+            setTimeout(() => {
+                showToast('info', 'System Ready', 'Inventory Management System connected to API');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
