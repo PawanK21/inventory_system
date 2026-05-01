@@ -7,20 +7,16 @@ echo Inventory Management System
 echo ========================================
 echo.
 
-REM Check if Python is installed
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo Error: Python is not installed or not in PATH
-    pause
-    exit /b 1
-)
+REM Activate virtual environment
+echo Activating virtual environment...
+call .venv\Scripts\activate.bat
 
-REM Check and install dependencies if needed
+REM Check dependencies
 echo Checking dependencies...
 python -m pip show fastapi >nul 2>&1
 if errorlevel 1 (
-    echo Installing dependencies...
-    python -m pip install -q fastapi uvicorn[standard] pydantic python-multipart starlette typing-extensions
+    echo Installing dependencies from requirements.txt...
+    python -m pip install -r requirements.txt
 )
 
 REM Create static directory if needed

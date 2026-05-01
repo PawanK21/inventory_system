@@ -8,6 +8,7 @@ from datetime import datetime
 from enum import Enum
 import uvicorn
 from uuid import uuid4
+import os
 
 # ==================== ENUMS ====================
 
@@ -671,4 +672,20 @@ async def get_stats():
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000, reload=False)
+    # Read configuration from environment variables
+    host = os.getenv("HOST", "localhost")
+    port = int(os.getenv("PORT", "8000"))
+    workers = int(os.getenv("WORKERS", "1"))
+    
+    # Use localhost for development, 0.0.0.0 for Docker/production
+    if os.getenv("ENVIRONMENT", "development") == "production":
+        host = "0.0.0.0"
+    
+    uvicorn.run(
+        app,
+        host=host,
+        port=port,
+        workers=workers if workers > 1 else 1,
+        reload=False,
+        log_level="info"
+    )
