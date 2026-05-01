@@ -15,14 +15,32 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo Installing dependencies...
-python -m pip install -q fastapi uvicorn[standard] pydantic python-multipart starlette typing-extensions
+REM Create virtual environment if it doesn't exist
+if not exist ".venv" (
+    echo Creating virtual environment...
+    python -m venv .venv
+    echo Virtual environment created
+)
+
+REM Activate virtual environment
+echo Activating virtual environment...
+call .venv\Scripts\activate.bat
+
+REM Upgrade pip
+echo Upgrading pip...
+python -m pip install --upgrade pip setuptools wheel -q
+
+REM Install dependencies from requirements.txt
+echo Installing dependencies from requirements.txt...
+python -m pip install -r requirements.txt
 
 if errorlevel 1 (
     echo Error: Failed to install dependencies
     pause
     exit /b 1
 )
+
+echo Dependencies installed successfully
 
 REM Create static directory
 if not exist "static" (
@@ -44,7 +62,9 @@ echo Setup Complete!
 echo ========================================
 echo.
 echo To start the server, run:
-echo   python main.py
+echo   run.bat (recommended)
+echo   or
+echo   .venv\Scripts\python.exe main.py
 echo.
 echo Then open your browser to:
 echo   http://localhost:8000

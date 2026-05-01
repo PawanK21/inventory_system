@@ -1,0 +1,43 @@
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist
+build
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv
+venv
+env
+ENV
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+*.log
+*.sqlite3
+*.db
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+.tox
+
+# Documentation
+docs/_build
